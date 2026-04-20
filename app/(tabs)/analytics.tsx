@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { getAllStats, getAllTrades } from '../../src/db/trades';
 import { calcPnl } from '../../src/utils/pnl';
 import { PixelCard } from '../../src/components/ui/PixelCard';
@@ -78,6 +79,7 @@ export default function AnalyticsScreen() {
   const maxPnl = summaries.reduce((m, s) => Math.max(m, Math.abs(s.realizedPnl)), 0);
 
   return (
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>투자 분석</Text>
 
@@ -131,12 +133,14 @@ export default function AnalyticsScreen() {
         </PixelCard>
       )}
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: Colors.background },
   container: { flex: 1, backgroundColor: Colors.background },
-  content: { padding: Spacing.md, paddingTop: Spacing.xl },
+  content: { padding: Spacing.md, paddingTop: Spacing.md },
   title: {
     fontSize: FontSize.xxl,
     fontWeight: '900',

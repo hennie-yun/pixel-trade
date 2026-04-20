@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   View, Text, FlatList, StyleSheet, TouchableOpacity,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar, DateData } from 'react-native-calendars';
 import { useRouter } from 'expo-router';
 import { useTradeStore } from '../../src/store/tradeStore';
@@ -52,7 +53,7 @@ export default function CalendarScreen() {
   const isBuy = (t: Trade) => t.tradeType === 'BUY';
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {/* 달력 */}
       <Calendar
         current={selectedDate}
@@ -124,7 +125,7 @@ export default function CalendarScreen() {
           />
         )}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

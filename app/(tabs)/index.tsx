@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, FlatList,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTradeStore } from '../../src/store/tradeStore';
 import { useBrokerStore } from '../../src/store/brokerStore';
@@ -58,6 +59,7 @@ export default function HomeScreen() {
   const isLoss = todayPnl < 0;
 
   return (
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* 헤더 */}
       <View style={styles.header}>
@@ -113,12 +115,14 @@ export default function HomeScreen() {
         style={styles.calendarBtn}
       />
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: Colors.background },
   container: { flex: 1, backgroundColor: Colors.background },
-  content: { padding: Spacing.md, paddingTop: Spacing.xl },
+  content: { padding: Spacing.md, paddingTop: Spacing.md },
   header: { marginBottom: Spacing.lg },
   appTitle: {
     fontSize: FontSize.hero,

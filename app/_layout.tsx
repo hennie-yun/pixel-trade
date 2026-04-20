@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { initDb } from '../src/db/schema';
 import { initStockMaster } from '../src/utils/stockSearch';
 import { Colors, FontSize } from '../constants/theme';
@@ -26,22 +27,26 @@ export default function RootLayout() {
 
   if (error) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.errorText}>DB 초기화 실패: {error}</Text>
-      </View>
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.center}>
+          <Text style={styles.errorText}>DB 초기화 실패: {error}</Text>
+        </SafeAreaView>
+      </SafeAreaProvider>
     );
   }
 
   if (!ready) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.loadingText}>PixelTrade 로딩 중...</Text>
-      </View>
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.center}>
+          <Text style={styles.loadingText}>PixelTrade 로딩 중...</Text>
+        </SafeAreaView>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <>
+    <SafeAreaProvider>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
@@ -54,7 +59,7 @@ export default function RootLayout() {
         />
       </Stack>
       <StatusBar style="dark" />
-    </>
+    </SafeAreaProvider>
   );
 }
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useBrokerStore } from '../../src/store/brokerStore';
 import { PixelCard } from '../../src/components/ui/PixelCard';
 import { PixelButton } from '../../src/components/ui/PixelButton';
@@ -98,6 +99,7 @@ export default function SettingsScreen() {
   }
 
   return (
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>설정</Text>
 
@@ -163,12 +165,14 @@ export default function SettingsScreen() {
         </View>
       </PixelCard>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: Colors.background },
   container: { flex: 1, backgroundColor: Colors.background },
-  content: { padding: Spacing.md, paddingTop: Spacing.xl },
+  content: { padding: Spacing.md, paddingTop: Spacing.md },
   title: { fontSize: FontSize.xxl, fontWeight: '900', color: Colors.textPrimary, marginBottom: Spacing.lg },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.sm },
   sectionTitle: { fontSize: FontSize.lg, fontWeight: '800', color: Colors.textPrimary },
