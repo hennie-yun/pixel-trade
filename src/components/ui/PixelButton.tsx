@@ -23,11 +23,11 @@ interface Props {
 }
 
 const variantStyles: Record<Variant, { bg: string; text: string; border: string }> = {
-  primary: { bg: Colors.primary,     text: '#fff',              border: Colors.border },
-  accent:  { bg: Colors.accent,      text: '#fff',              border: Colors.border },
-  danger:  { bg: Colors.danger,      text: '#fff',              border: Colors.border },
-  outline: { bg: 'transparent',      text: Colors.textPrimary,  border: Colors.border },
-  ghost:   { bg: 'transparent',      text: Colors.textSecondary, border: 'transparent' },
+  primary: { bg: Colors.primary,          text: '#fff',              border: Colors.border },
+  accent:  { bg: Colors.accent,           text: '#fff',              border: Colors.border },
+  danger:  { bg: Colors.danger,           text: '#fff',              border: Colors.border },
+  outline: { bg: Colors.background,       text: Colors.textPrimary,  border: Colors.border },
+  ghost:   { bg: Colors.background,       text: Colors.textSecondary, border: 'transparent' },
 };
 
 export function PixelButton({

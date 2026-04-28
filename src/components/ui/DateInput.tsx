@@ -1,5 +1,6 @@
-import React from 'react';
-import { View, Text, TextInput, StyleSheet, ViewStyle } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import React, { useState } from 'react';
+import { Platform, Text, TextInput, TouchableOpacity, View, ViewStyle, StyleSheet } from 'react-native';
 import { Colors, FontSize, Spacing } from '../../../constants/theme';
 
 interface Props {
@@ -10,28 +11,30 @@ interface Props {
   containerStyle?: ViewStyle;
 }
 
-/**
- * 날짜 자동 정제 입력
- *
- * 입력 패턴:
- *  - 숫자 6자리 (YYMMDD)   → 2026-03-26
- *  - 숫자 8자리 (YYYYMMDD) → 2026-03-26
- *  - 입력 중 자동 대시 삽입: 4자리 뒤, 6자리 뒤
- */
+function toDateObject(value: string): Date {
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? new Date() : d;
+}
+
+function toIsoDate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 export function DateInput({ label, value, onChange, error, containerStyle }: Props) {
+  const [showPicker, setShowPicker] = useState(false);
 
   function applyFormat(digits: string): string {
-    // 6자리 YYMMDD → 20YYMMDD
     if (digits.length === 6) {
       const full = '20' + digits;
       return `${full.slice(0, 4)}-${full.slice(4, 6)}-${full.slice(6, 8)}`;
     }
-    // 8자리 YYYYMMDD
     if (digits.length >= 8) {
       const d = digits.slice(0, 8);
       return `${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`;
     }
-    // 타이핑 중 — 대시 자동 삽입
     if (digits.length > 6) {
       return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6)}`;
     }
@@ -47,11 +50,15 @@ export function DateInput({ label, value, onChange, error, containerStyle }: Pro
   }
 
   function handleBlur() {
-    // blur 시 남은 6자리 처리 (타이핑 완료 시점)
     const digits = value.replace(/\D/g, '');
     if (digits.length === 6 || digits.length === 8) {
       onChange(applyFormat(digits));
     }
+  }
+
+  function handlePickerChange(_: any, selected?: Date) {
+    if (Platform.OS === 'android') setShowPicker(false);
+    if (selected) onChange(toIsoDate(selected));
   }
 
   return (
@@ -68,12 +75,24 @@ export function DateInput({ label, value, onChange, error, containerStyle }: Pro
           keyboardType="numeric"
           maxLength={10}
         />
-        <Text style={styles.hint}>📅</Text>
+        <TouchableOpacity onPress={() => setShowPicker(true)} style={styles.calendarBtn}>
+          <Text style={styles.hint}>📅</Text>
+        </TouchableOpacity>
       </View>
       {error ? (
         <Text style={styles.error}>{error}</Text>
       ) : (
         <Text style={styles.subHint}>260326 또는 20260326 입력 가능</Text>
+      )}
+
+      {showPicker && (
+        <DateTimePicker
+          mode="date"
+          display={Platform.OS === 'ios' ? 'inline' : 'default'}
+          value={toDateObject(value)}
+          onChange={handlePickerChange}
+          onTouchCancel={() => setShowPicker(false)}
+        />
       )}
     </View>
   );
@@ -104,10 +123,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     letterSpacing: 1,
   },
-  hint: {
-    paddingRight: Spacing.sm,
-    fontSize: 16,
-  },
+  calendarBtn: { paddingRight: Spacing.sm, paddingLeft: Spacing.xs },
+  hint: { fontSize: 16 },
   subHint: {
     fontSize: FontSize.xs,
     color: Colors.textMuted,

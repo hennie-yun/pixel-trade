@@ -1,5 +1,5 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView, StyleSheet,
   Text,
@@ -12,6 +12,7 @@ import { DateInput } from '../../src/components/ui/DateInput';
 import { PixelButton } from '../../src/components/ui/PixelButton';
 import { PixelCard } from '../../src/components/ui/PixelCard';
 import { PixelInput } from '../../src/components/ui/PixelInput';
+import { getTradeById } from '../../src/db/trades';
 import { useBrokerStore } from '../../src/store/brokerStore';
 import { useTradeStore } from '../../src/store/tradeStore';
 import { TradeType } from '../../src/types';
@@ -22,11 +23,14 @@ const SELL_TAX_RATE_PCT = 0.2; // %
 
 export default function NewTradeScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ date?: string }>();
+  const navigation = useNavigation();
+  const params = useLocalSearchParams<{ date?: string; id?: string }>();
   const today = new Date().toISOString().slice(0, 10);
   const initialDate = params.date ?? today;
+  const editId = params.id ? Number(params.id) : null;
+  const isEdit = editId !== null;
 
-  const { addTrade } = useTradeStore();
+  const { addTrade, editTrade } = useTradeStore();
   const { brokers } = useBrokerStore();
 
   const [tradeType, setTradeType] = useState<TradeType>('BUY');
@@ -39,6 +43,27 @@ export default function NewTradeScreen() {
   const [brokerId, setBrokerId] = useState<number | null>(null);
   const [memo, setMemo] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (isEdit) {
+      const trade = getTradeById(editId);
+      if (trade) {
+        setTradeType(trade.tradeType);
+        setStockName(trade.stockName);
+        setTicker(trade.ticker ?? '');
+        setDate(trade.date);
+        setPrice(String(trade.price));
+        setQuantity(String(trade.quantity));
+        setFee(String(trade.fee));
+        setBrokerId(trade.brokerId ?? null);
+        setMemo(trade.memo ?? '');
+      }
+    }
+  }, [editId]);
+
+  useEffect(() => {
+    navigation.setOptions({ title: isEdit ? '매매 수정' : '매매 기록' });
+  }, [isEdit]);
 
   // ─── 수수료 계산 ─────────────────────────────────────────────
   function calcFee(p: number, q: number, type: TradeType, brokerFeeRate: number): number {
@@ -93,7 +118,7 @@ export default function NewTradeScreen() {
 
   function handleSave() {
     if (!validate()) return;
-    addTrade({
+    const data = {
       date,
       stockName: stockName.trim(),
       ticker: ticker.trim(),
@@ -103,7 +128,12 @@ export default function NewTradeScreen() {
       fee: parseFloat(fee) || 0,
       brokerId,
       memo: memo.trim(),
-    });
+    };
+    if (isEdit) {
+      editTrade(editId, data);
+    } else {
+      addTrade(data);
+    }
     router.back();
   }
 
@@ -272,7 +302,7 @@ export default function NewTradeScreen() {
       )}
 
       <PixelButton
-        label="저장하기"
+        label={isEdit ? '수정 완료' : '저장하기'}
         variant={tradeType === 'BUY' ? 'accent' : 'primary'}
         fullWidth
         onPress={handleSave}

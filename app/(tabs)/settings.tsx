@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import {
-  View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert,
+  Alert,
+  ScrollView, StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useBrokerStore } from '../../src/store/brokerStore';
-import { PixelCard } from '../../src/components/ui/PixelCard';
-import { PixelButton } from '../../src/components/ui/PixelButton';
-import { PixelInput } from '../../src/components/ui/PixelInput';
-import { exportAllData, importAllData } from '../../src/db/backup';
 import { Colors, FontSize, Spacing } from '../../constants/theme';
+import { PixelButton } from '../../src/components/ui/PixelButton';
+import { PixelCard } from '../../src/components/ui/PixelCard';
+import { PixelInput } from '../../src/components/ui/PixelInput';
+import { exportAllData } from '../../src/db/backup';
+import { useBrokerStore } from '../../src/store/brokerStore';
 import { Broker } from '../../src/types';
 
 function BrokerItem({ broker, onEdit, onDelete }: {
@@ -155,7 +159,7 @@ export default function SettingsScreen() {
       )}
 
       {/* 데이터 관리 */}
-      <Text style={[styles.sectionTitle, { marginTop: Spacing.xl }]}>데이터 관리</Text>
+      {/* <Text style={[styles.sectionTitle, { marginTop: Spacing.xl }]}>데이터 관리</Text>
       <PixelCard style={styles.dataCard}>
         <PixelButton label="📤  데이터 내보내기 (JSON)" variant="outline" fullWidth onPress={handleExport} />
         <View style={styles.dataNote}>
@@ -163,7 +167,7 @@ export default function SettingsScreen() {
             ℹ️  모든 매매 기록과 증권사 설정을 JSON 파일로 백업합니다.
           </Text>
         </View>
-      </PixelCard>
+      </PixelCard> */}
     </ScrollView>
     </SafeAreaView>
   );

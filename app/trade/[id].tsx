@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, Alert,
 } from 'react-native';
-import { useLocalSearchParams, useRouter, useNavigation } from 'expo-router';
+import { useLocalSearchParams, useRouter, useNavigation, useFocusEffect } from 'expo-router';
 import { getTradeById } from '../../src/db/trades';
 import { useTradeStore } from '../../src/store/tradeStore';
 import { PixelCard } from '../../src/components/ui/PixelCard';
@@ -28,12 +28,14 @@ export default function TradeDetailScreen() {
   const { removeTrade } = useTradeStore();
   const [trade, setTrade] = useState<Trade | null>(null);
 
-  useEffect(() => {
-    if (params.id) {
-      const t = getTradeById(Number(params.id));
-      setTrade(t);
-    }
-  }, [params.id]);
+  useFocusEffect(
+    useCallback(() => {
+      if (params.id) {
+        const t = getTradeById(Number(params.id));
+        setTrade(t);
+      }
+    }, [params.id])
+  );
 
   useEffect(() => {
     if (trade) {
@@ -113,14 +115,21 @@ export default function TradeDetailScreen() {
         </PixelCard>
       ) : null}
 
-      {/* 삭제 버튼 */}
-      <PixelButton
-        label="이 기록 삭제"
-        variant="danger"
-        fullWidth
-        onPress={handleDelete}
-        style={styles.deleteBtn}
-      />
+      {/* 수정 / 삭제 버튼 */}
+      <View style={styles.actionRow}>
+        <PixelButton
+          label="수정하기"
+          variant="outline"
+          style={styles.actionBtn}
+          onPress={() => router.push({ pathname: '/trade/new', params: { id: trade.id } })}
+        />
+        <PixelButton
+          label="삭제"
+          variant="danger"
+          style={styles.actionBtn}
+          onPress={handleDelete}
+        />
+      </View>
     </ScrollView>
   );
 }
@@ -163,5 +172,6 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xs,
   },
   memoText: { fontSize: FontSize.md, color: Colors.textPrimary, lineHeight: 22 },
-  deleteBtn: { marginTop: Spacing.sm },
+  actionRow: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.sm },
+  actionBtn: { flex: 1 },
 });
